@@ -5,7 +5,7 @@ const startDir = process.argv[2]
 const destinationDirParam = process.argv[3]
 const destinationDir = "./destDir"
 const keepStartDir = process.argv[4]
-if (destinationDirParam === '0') {
+if (destinationDirParam === 'Auto') {
   fs.mkdirSync(destinationDir)
 }else if(!destinationDirParam){
   console.log('Specify destination directory or enter "Auto"');
