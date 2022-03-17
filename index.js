@@ -1,5 +1,7 @@
 const path = require('path')
 const fs = require('fs')
+const { resolve } = require('path')
+const { rejects } = require('assert')
 
 const startDir = process.argv[2]
 const destinationDirParam = process.argv[3]
@@ -16,24 +18,25 @@ if (!startDir) {
   return
 }
 
-const readDir = (base, level) => {
+const readDir =async (base, level) => {
   const files = fs.readdirSync(base)
 
-  files.forEach(item => {
+  files.forEach(async (item) => {
     let localBase = path.join(base, item)
     let state = fs.statSync(localBase)
     let fileName = path.basename(item)
     let dirname = fileName[0].toUpperCase()
     if (state.isDirectory()) {
-      readDir(localBase, level + 1)
+      await readDir(localBase, level + 1)
     } else {
-      createDir(fileName)
-      movingFiles(base, dirname, fileName)
+     await createDir(fileName)
+     await movingFiles(base, dirname, fileName)
     }
 
   })
 }
-const createDir = (fileName) => {
+
+const createDir = async (fileName) => {
   const firstLetter = fileName[0].toUpperCase()
   const dirname = `${firstLetter}`
   const dirPath = path.join(__dirname, destinationDir, dirname)
@@ -42,14 +45,14 @@ const createDir = (fileName) => {
   }
 }
 
-const movingFiles = (dir, dirName, fileName) => {
+const movingFiles =async (dir, dirName, fileName) => {
   const oldPath = path.join(__dirname, dir, fileName)
   const newPath = path.join(__dirname, destinationDir, dirName, fileName)
   fs.linkSync(oldPath, newPath, (err) => {
     console.log(err)
   })
 }
-const removeDir = () => {
+const  removeDir = async() => {
   fs.rm(startDir, { recursive: true, force: true }, (err) => {
     if (err) throw err
   })
